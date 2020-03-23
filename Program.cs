@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 
-using Grasshopper.Kernel; // Libraries of GH 
-using Rhino.Geometry; // Libraries of Rhino 
+//using Grasshopper.Kernel; // Libraries of GH 
+//using Rhino.Geometry; // Libraries of Rhino 
 
 using System.Linq;
 using System.Text;
