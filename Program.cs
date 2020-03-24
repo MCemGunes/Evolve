@@ -1,34 +1,65 @@
 using System;
 using System.Collections.Generic;
-
-//using Grasshopper.Kernel; // Libraries of GH 
-//using Rhino.Geometry; // Libraries of Rhino 
-
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+//using Grasshopper.Kernel; // Libraries of GH 
+//using Rhino.Geometry; // Libraries of Rhino 
+
 namespace Matrix_Evolve
 {
+    /* It ıs a console application might be run on VS or any compiler*/
+
+
+    /* Istead of wrting methods seperately in main program, it is better to use class base
+     inpormations to keep things organizes/ we are not transsferred here yet but we created the str.*/
+
+    /*
+    public class Zone
+    {
+        public string Name;
+        public int SpaceLimit;
+        public Int16 SpaceSize;
+        public int Counter;
+        public List<Int16> SpaceList;
+
+        public void Describe()
+        {
+            Console.WriteLine("Hey this zone is{ 0} ", Name);
+        }
+
+        public Zone()
+        {
+           // SpaceList = new List<int>();
+        }
+
+        public Zone(string name, int spaceLimit,int spacesize,int counter, List<int> SpaceList)
+        :this()
+        {
+                
+        }
+
+        static void InitializeZeroMatrice() { }
+        static void startZones() { }
+        public void SpreadZones() { }
+
+    }
+    */
     class Program
     {
-        // open on Grasshopper
-        /*
+
+        /* // open on Grasshopper
         static List<Circle> RedCircles = new List<Circle>();
         static List<Circle> BlueCircles = new List<Circle>();
         static List<Circle> GreenCircles = new List<Circle>();
-        static List<Circle> WhiteCircles = new List<Circle>();   
+        static List<Circle> YellowCircles = new List<Circle>();
+        static List<Circle> BlackCircles = new List<Circle>();
+        static List<Circle> WhiteCircles = new List<Circle>();
         */
 
         // Comment Console.Write and Concole.WriteLine in Grasshopper
 
-        //readonly static List<int> redInitialPoint = new List<int>();
-
-        // these points are gonna be used for limiting the evaluation if it  starts to create some unuseful options
-        static int[] redInitialPoints = new int[2] { 0, 0 }; //We use static because we use the variabels in a Class. Not with an object.
-        static int[] greenInitialPoints = new int[2] { 0, 0 };
-        static int[] blueInitialPoints = new int[2] { 0, 0 };
-        static int[] yellowInitialPoints = new int[2] { 0, 0 };
 
         static void ShowMatrix(int[,] Arr) // A method to visualize the matrix in Console.App .All the Console commands needs to be transform sth else in GS.Print might work but it didnt.
         {
@@ -43,7 +74,7 @@ namespace Matrix_Evolve
             }
             Console.WriteLine("   ");
             return;
-        }
+        }     
         static int[,] InitializeZeroMatrice(int width, int height) // initialize the matrix, using given arguments.
         {
             var areaArray = new int[width, height];
@@ -61,38 +92,48 @@ namespace Matrix_Evolve
         static List<int> redList = new List<int>();
         static List<int> greenList = new List<int>();
         static List<int> blueList = new List<int>();
+        static List<int> yellowList = new List<int>();
+        static List<int> blackList = new List<int>();
         /**           These sizes are Spreading Limits for the spaces                     **/
-        static int blueSize = 100;
-        static int redSize = 100;
-        static int greenSize = 100;
+        static int blueSize = 200;
+        static int redSize = 200;
+        static int greenSize = 200;
+        static int yellowSize = 200;
+        static int blackSize = 200;
         /**           these counters are used for starting the límitations counts.         **/
         static int blueCounter = 1;
         static int redCounter = 1;
         static int greenCounter = 1;
+        static int yellowCounter = 1;
+        static int blackCounter = 1;
+        /**           these limits are used for defining max distance that zone can spread.  **/
+        static int blueLimit = 300;
+        static int redLimit = 300;
+        static int greenLimit = 300;
+        static int yellowLimit = 300;
+        static int blackLimit = 300;
 
-        /**           Randomly Starts the color. Takes the Color lists as argumnts 
-         * (We can delete these argumnents and it can get them as local referance
-         * in our case it gives us a chance to choose what to initilize)  
-         * 
-         * **/
 
-        static void StartColors(int[,] arr, List<int> RedList, List<int> greenList, List<int> blueList)
+
+        static void StartColors(int[,] arr)
         {
+
+            /**           
+             * Randomly Starts the color. Takes the Color lists as argumnts 
+             * (We can delete these argumnents and it can get them as local referance
+             * in our case it gives us a chance to choose what to initilize)   
+             * **/
             Random rand = new Random();
             //----------------------
             /* GetLength(0) and GetLength(1) might be set as variable */
             var a = rand.Next(0, arr.GetLength(0)); //Array.GetLength(0) gives the column lenght in other words height of an array
             var b = rand.Next(0, arr.GetLength(1)); //Array.GetLength(1) gives the row lenght in other words width of an array
 
-            redInitialPoints[0] = a; redInitialPoints[1] = b;
-
-            RedList.AddRange(new int[2] { a, b }); //AddRange ==> Adds multiple elements to a List . We use mod%2 to call the index of the point back instead of stacking them as an another List(or Array) in our list. 
+            redList.AddRange(new int[2] { a, b }); //AddRange ==> Adds multiple elements to a List . We use mod%2 to call the index of the point back instead of stacking them as an another List(or Array) in our list. 
             arr[a, b] = 1;// Red Starting Point
             //----------------------
-            a = rand.Next(0, arr.GetLength(0));
-            b = rand.Next(0, arr.GetLength(1));
-
-            greenInitialPoints[0] = a; greenInitialPoints[1] = b;
+            a = rand.Next(0, arr.GetLength(0)); 
+            b = rand.Next(0, arr.GetLength(1)); 
 
             greenList.AddRange(new int[2] { a, b });
             arr[a, b] = 2; // Green Starting Point
@@ -100,24 +141,33 @@ namespace Matrix_Evolve
             a = rand.Next(0, arr.GetLength(0));
             b = rand.Next(0, arr.GetLength(1));
 
-            blueInitialPoints[0] = a; blueInitialPoints[1] = b;
-
             blueList.AddRange(new int[2] { a, b });
             arr[a, b] = 3; // Blue Starting Point
+            //----------------------
+            a = rand.Next(0, arr.GetLength(0));
+            b = rand.Next(0, arr.GetLength(1));
+
+            yellowList.AddRange(new int[2] { a, b });
+            arr[a, b] = 4; // Yellow Starting Point
+            //----------------------
+            a = rand.Next(0, arr.GetLength(0));
+            b = rand.Next(0, arr.GetLength(1));
+
+            blackList.AddRange(new int[2] { a, b });
+            arr[a, b] = 5; // Black Starting Point
             //----------------------
         }
 
         /* Calculates the distance between initial point in the color and the possible new point!
          *  (if the possible new point is too far from inital point eleminate it.) */
-        static double distanceCalculate(int[] Initial, int x2, int y2)
+        static double distanceCalculate(List<int> spaceCoordList, int x2, int y2)
         {
-            var distance = Math.Sqrt((y2 - Initial[1]) * (y2 - Initial[1]) + (x2 * Initial[0]) * (x2 * Initial[0]));
+            var distance = Math.Sqrt((y2 - spaceCoordList[1]) * (y2 - spaceCoordList[1]) + (x2 - spaceCoordList[0]) * (x2 - spaceCoordList[0]));
             return distance;
         }
 
-        static void Spread(int[,] arr, ref int spaceSize, List<int> spaceCoordList, ref int counter) //if we dont use ref Method will not update local variables.
+        static void Spread( int[,] arr, ref int spaceSize,List<int> spaceCoordList, ref int counter,int spaceLimit)
         {
-
             /*ARGUMENTS 
              * (The main array which has rectangular form(will be 3d in short) ,
              * spaceSize = MAximum limit that can grow.  ,
@@ -129,7 +179,6 @@ namespace Matrix_Evolve
             int Ycoord;
             bool draw = false;
             int trycount = 0;
-
 
             while (draw == false && counter <= spaceSize)
             {
@@ -144,19 +193,19 @@ namespace Matrix_Evolve
 
                     Console.WriteLine("Coordinates if the new Cell is = {0}, {1}\n", Xcoord, Ycoord);
 
-                    if (Xcoord < arr.GetLength(0) - 1 && Xcoord > 0 && Ycoord > 0 && Ycoord < arr.GetLength(1) - 1)
+                    if (Xcoord < arr.GetLength(0) - 1 && Xcoord > 0 && Ycoord > 0 && Ycoord < arr.GetLength(1) - 1) 
                     {
                         /* Check the conditions INSIDE borders */
-                        if (arr[Xcoord + 1, Ycoord] == 0) // Check if possible new cell is still white or not!
+                        if (arr[Xcoord + 1, Ycoord] == 0 && distanceCalculate(spaceCoordList, Xcoord + 1, Ycoord)<spaceLimit ) // Check if possible new cell is still white or not!
                             directionList.AddRange(new int[2] { (Xcoord + 1), Ycoord }); //Store possible spread directions in a list.
 
-                        if (arr[Xcoord - 1, Ycoord] == 0)
+                        if (arr[Xcoord - 1, Ycoord] == 0 && distanceCalculate(spaceCoordList, Xcoord -1, Ycoord) < spaceLimit)
                             directionList.AddRange(new int[2] { (Xcoord - 1), Ycoord }); //Store possible spread directions in a list.
 
-                        if (arr[Xcoord, Ycoord + 1] == 0)
+                        if (arr[Xcoord, Ycoord + 1] == 0 && distanceCalculate(spaceCoordList, Xcoord , Ycoord+1) < spaceLimit)
                             directionList.AddRange(new int[2] { (Xcoord), Ycoord + 1 }); //Store possible spread directions in a list.
 
-                        if (arr[Xcoord, Ycoord - 1] == 0)
+                        if (arr[Xcoord, Ycoord - 1] == 0 && distanceCalculate(spaceCoordList, Xcoord , Ycoord-1) < spaceLimit)
                             directionList.AddRange(new int[2] { (Xcoord), (Ycoord - 1) }); //Store possible spread directions in a list.
 
                         if (directionList.Count > 0)
@@ -375,8 +424,16 @@ namespace Matrix_Evolve
                     /* EDGE CONDITIONS */
                 }
             }
-
+            
         }
+
+        static void Evaluate()
+        {
+            // according to relations give score to the created zones
+            // get the centers of the zones and acoording to the distances and created sizes give
+            //positive or negative points and if score is not acceptable re-run and create variatians.
+        }
+
 
         /*
         static void drawCircles(int[,] arr, double radius=5)
@@ -420,18 +477,18 @@ namespace Matrix_Evolve
 
             int[,] areaArray = InitializeZeroMatrice(height, width);
 
-            StartColors(areaArray, redList, greenList, blueList);
+            StartColors(areaArray);
 
-            for (int i = 0; i < 300; i++) // Calls the spreading functions in order and repettively as much as we want.
+            for (int i = 0; i < 500; i++) // Calls the spreading functions in order and repettively as much as we want.
             {
-                Spread(areaArray, ref redSize, redList, ref redCounter);
-                Spread(areaArray, ref greenSize, greenList, ref greenCounter);
-                Spread(areaArray, ref blueSize, blueList, ref blueCounter);
+                Spread(areaArray, ref redSize, redList, ref redCounter,redLimit);
+                Spread(areaArray, ref greenSize, greenList, ref greenCounter,greenLimit);
+                Spread(areaArray, ref blueSize, blueList,ref blueCounter,blueLimit);
+                Spread(areaArray, ref yellowSize, yellowList,ref yellowCounter,yellowLimit);
+                Spread(areaArray, ref blackSize, blackList,ref blackCounter,blackLimit);
 
             }
             ShowMatrix(areaArray);
-
-
 
             //drawCircles(areaArray, 5.0); // open on grasshopper
 
@@ -440,7 +497,24 @@ namespace Matrix_Evolve
             R = RedCircles;
             G = GreenCircles;
             B = BlueCircles;
+            K = BlackCircles:
             W = WhiteCircles;
+            */
+
+            /* Transforming to Class based Alg. to control them easily*/
+
+            /*
+            Zone red = new Zone();
+            red.Name = "red";
+            Console.WriteLine("Zone name: {0}",red.Name);
+
+            var zone1 = new Zone
+            {
+                Name = "",
+                SpaceLimit = 400,
+                Counter = 1,
+                SpaceSize = 300
+            };
             */
         }
     }
